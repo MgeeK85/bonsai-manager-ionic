@@ -1,0 +1,22 @@
+{
+  "db": {
+    "name": "db",
+    "connector": "memory"
+  },
+  "images": {
+    "name": "images",
+    "connector": "loopback-component-storage",
+    "provider": "filesystem",
+    "root": "./client/"
+  },
+  "filestore": {
+    "url": "mongodb://admin:AYIKEAKDEPIMGQLD@sl-us-south-1-portal.3.dblayer.com:19950,sl-us-south-1-portal.1.dblayer.com:19950/compose?ssl=true&authSource=admin",
+    "name": "filestore",
+    "connector": "loopback-component-storage-mongo"
+  },
+  "dev": {
+    "url": "mongodb://admin:AYIKEAKDEPIMGQLD@sl-us-south-1-portal.3.dblayer.com:19950,sl-us-south-1-portal.1.dblayer.com:19950/compose?ssl=true&authSource=admin",
+    "name": "dev",
+    "connector": "mongodb"
+  }
+}

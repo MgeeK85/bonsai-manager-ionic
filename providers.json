@@ -1,0 +1,36 @@
+{
+  "facebook-login": {
+    "provider": "facebook",
+    "module": "passport-facebook",
+    "clientID": "619168668472361",
+    "clientSecret": "210f9abd799b1132097526c612677f7d",
+    "callbackURL": "http://localhost:3000/auth/facebook/callback",
+    "authPath": "/auth/facebook",
+    "callbackPath": "/auth/facebook/callback",
+    "successRedirect": "http://localhost:9000/index.html",
+    "scope": ["public_profile"]
+  },
+  "google-login": {
+    "provider": "google",
+    "module": "passport-google-oauth",
+    "strategy": "OAuth2Strategy",
+    "clientID": "96178484285-ogmi32ollh4mr4btog2fvfjmmk6c5mqr.apps.googleusercontent.com",
+    "clientSecret": "JzgRN0cea9YQ7mdrbtww_0WN",
+    "callbackURL": "https://bonsai-manager.mybluemix.net/auth/google/callback",
+    "authPath": "/auth/google",
+    "callbackPath": "/auth/google/callback",
+    "successRedirect": "/index.html",
+    "scope": ["email", "profile"]
+  },
+  "twitter-login": {
+    "provider": "twitter",
+    "authScheme": "oauth",
+    "module": "passport-twitter",
+    "callbackURL": "https://bonsai-manager.mybluemix.net/auth/twitter/callback",
+    "authPath": "/auth/twitter",
+    "callbackPath": "/auth/twitter/callback",
+    "successRedirect": "https://bonsai-manager.mybluemix.net/index.html",
+    "consumerKey": "6f9TtmeVg4jB9OSgvSU40LR86",
+    "consumerSecret": "sxPpahCjsKvOTEj5ED6i6n1hNjqXD88E4cIoJWgkzUvHkpgWNv"
+  }
+}

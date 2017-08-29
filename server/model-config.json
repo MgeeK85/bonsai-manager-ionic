@@ -1,0 +1,59 @@
+{
+  "_meta": {
+    "sources": [
+      "loopback/common/models",
+      "loopback/server/models",
+      "../common/models",
+      "./models",
+      "./node_modules/loopback-component-passport/lib/models"
+    ],
+    "mixins": [
+      "loopback/common/mixins",
+      "loopback/server/mixins",
+      "../common/mixins",
+      "./mixins"
+    ]
+  },
+  "User": {
+    "dataSource": "dev"
+  },
+  "AccessToken": {
+    "dataSource": "dev",
+    "public": false
+  },
+  "ACL": {
+    "dataSource": "dev",
+    "public": false
+  },
+  "RoleMapping": {
+    "dataSource": "dev",
+    "public": false,
+    "options": {
+      "strictObjectIDCoercion": true
+    }
+  },
+  "Role": {
+    "dataSource": "dev",
+    "public": false
+  },
+  "UserCredential": {
+    "dataSource": "dev",
+    "public": true
+  },
+  "UserIdentity": {
+    "dataSource": "dev",
+    "public": true
+  },
+  "Bonsai": {
+    "dataSource": "dev",
+    "public": true
+  },
+  "Container": {
+    "dataSource": "filestore",
+    "public": true
+  },
+  "Image": {
+    "dataSource": "filestore",
+    "public": true
+  }
+}
