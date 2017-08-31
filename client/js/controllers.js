@@ -5,11 +5,14 @@ angular.module('starter.controllers', [])
 
     var vm = this;
 
-    vm.openMyModal = openMyModal;
+    vm.openLoginModal = openLoginModal;
+    vm.openRegisterModal = openRegisterModal;
     vm.closeModal = closeModal;
     vm.doLogin = doLogin;
+    vm.cancelLogin = cancelLogin;
     vm.doLogout = doLogout;
-    vm.openRegister = openRegister;
+    vm.doRegister = doRegister;
+    vm.cancelRegister = cancelRegister;
 
     $rootScope.$on('login:Successful', function () {
         vm.loggedIn = AuthService.isAuthenticated();
@@ -22,21 +25,31 @@ angular.module('starter.controllers', [])
     });
 
     $scope.$watch('currentUser.id', function(value) {
+        console.log("value", value);
+
         if (!value) {
             return;
         }
-
-        console.log("value", value);
 
         vm.loggedIn = true;
     });
 
 
+    // Login
     $ionicModal.fromTemplateUrl('../templates/login.html', {
         scope: $scope,
         animation: 'slide-in-up'
     }).then(function(modal) {
         vm.modal = modal;
+    });
+
+
+    //Register
+    $ionicModal.fromTemplateUrl('../templates/register.html', {
+        scope: $scope,
+        animation: 'slide-in-up'
+    }).then(function(modal) {
+        vm.modalRegister = modal;
     });
 
 
@@ -52,12 +65,19 @@ angular.module('starter.controllers', [])
 
         vm.loggedIn = false;
         vm.modal = null;
-
-
+        vm.modalRegister = null;
     }
 
-    function openMyModal() {
+    function openLoginModal() {
         vm.modal.show();
+
+        console.log("rememberMe", vm.rememberMe);
+
+        if(vm.rememberMe) {
+            vm.loginData = $localStorage.getObject('userinfo','{}');
+
+            console.log("user", vm.loginData);
+        }
     }
 
     function closeModal() {
@@ -70,10 +90,22 @@ angular.module('starter.controllers', [])
         if(vm.rememberMe)
             $localStorage.storeObject('userinfo',vm.loginData);
 
+        console.log("login", vm.loginData);
+
         AuthService.login(vm.loginData);
 
         vm.modal.hide();
 
+    }
+
+    function cancelLogin() {
+        vm.loginData = {};
+        vm.modal.hide();
+    }
+
+    function cancelRegister() {
+        vm.registration = {};
+        vm.modalRegister.hide();
     }
 
     function doLogout() {
@@ -87,7 +119,7 @@ angular.module('starter.controllers', [])
             if(res) {
                 AuthService.logout()
                     .then(function() {
-                        $state.go('tab.home');
+                        $state.go('tab.home', {}, {reload: true});
                     });
             } else {
 
@@ -97,17 +129,30 @@ angular.module('starter.controllers', [])
 
     }
 
-    function openRegister() {
+    function openRegisterModal() {
+
+        vm.modalRegister.show();
 
         console.log("register");
-        ngDialog.open(
-            {
-                template: 'views/register.html',
-                scope: $scope,
-                className: 'ngdialog-theme-default',
-                controller:"RegisterCtrl"
-            }
-        );
+    }
+
+    function doRegister() {
+        console.log("register", vm.registration);
+
+        if(vm.rememberMe) {
+            vm.loginData = $localStorage.getObject('userinfo', '{}');
+        }
+
+        AuthService.register(vm.registration);
+
+
+        vm.loginData = {
+            username: vm.registration.username,
+            password: vm.registration.password
+        };
+
+        vm.modalRegister.hide();
+
     }
 
 
@@ -122,13 +167,13 @@ angular.module('starter.controllers', [])
     vm.bonsaiDetail = bonsaiDetail;
     vm.getSecondIndex = getSecondIndex;
 
+
     $scope.$watch('currentUser.id', function(value) {
+    console.log("value", value);
+
         if (!value) {
             return;
         }
-
-
-        console.log("value", value);
 
         vm.loggedIn = true;
 
@@ -188,6 +233,8 @@ angular.module('starter.controllers', [])
 
         console.log("home");
 
+        vm.loggedIn = false;
+
 
         /* Chart options */
         vm.options = {
@@ -239,15 +286,221 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('NewEditCtrl', function($scope) {
+.controller('NewEditCtrl', function($scope, $rootScope, $log, $state, $stateParams, Bonsai, AuthService) {
+    var vm = this;
 
+    vm.createUpdateBonsai = createUpdateBonsai;
+    vm.cancel = cancel;
+
+
+    $rootScope.$on('login:Successful', function () {
+        vm.loggedIn = AuthService.isAuthenticated();
+        vm.username = AuthService.getUsername();
+    });
+
+    $rootScope.$on('logout', function () {
+        vm.loggedIn = false;
+        vm.username = '';
+    });
+
+    $scope.$watch('currentUser.id', function(value) {
+        if (!value) {
+            return;
+        }
+
+        vm.loggedIn = true;
+
+    });
+
+
+    init();
+
+    ///////////////////////////
+
+
+    function init() {
+
+        vm.loggedIn = false;
+        vm.editMode = false;
+
+        if(AuthService.isAuthenticated()) {
+            // TODO cancel
+
+            /*
+            vm.bonsai = {
+                "name": "Test1",
+                "species": "Pinus",
+                "age": 10,
+                "height": 20,
+                "diameter": 30,
+                "style": "Chokkkan",
+                "pot": "Rectangular"
+            };
+
+            */
+
+
+            console.log("id:", $stateParams.id);
+
+            if($stateParams.id) {
+
+
+                Bonsai.findById({id: $stateParams.id})
+                    .$promise.then(
+                    function (response) {
+                        vm.bonsai = response;
+                        vm.editMode = true;
+
+                        //$scope.showDish = true;
+                    },
+                    function (response) {
+                        vm.message = "Error: " + response.status + " " + response.statusText;
+                    }
+                );
+
+            }
+
+        }
+
+    }
+
+
+    function createUpdateBonsai() {
+
+
+        if(vm.editMode) {
+
+            $log.info("update", vm.bonsai);
+
+            Bonsai.upsert( vm.bonsai).$promise.then(
+                function(data) {
+
+                    $log.info("bonsai saved", data);
+                    $state.go('tab.list');
+                }
+            );
+        } else {
+
+            $log.info("create", vm.bonsai);
+
+            Bonsai.create(vm.bonsai).$promise.then(
+                function(data) {
+
+                    $log.info("bonsai saved", data);
+                    $state.go('tab.list');
+                }
+            );
+        }
+
+
+
+
+    }
+
+    function cancel() {
+        $state.go('app.list');
+    }
 })
 
-.controller('ListCtrl', function($rootScope, $scope, User, AuthService) {
+.controller('BonsaiDetailCtrl', function($scope, $state, $stateParams, Bonsai, ngDialog) {
+    var vm = this;
+
+    vm.deleteBonsai = deleteBonsai;
+
+    $scope.$watch('currentUser.id', function(value) {
+
+        console.log("detail value");
+
+        if (!value) {
+            return;
+        }
+
+        vm.loggedIn = true;
+
+        Bonsai.findById({id: $stateParams.id})
+            .$promise.then(
+            function (response) {
+                vm.bonsai = response;
+
+                console.log("bonsai", vm.bonsai);
+                //$scope.showDish = true;
+            },
+            function (response) {
+                vm.message = "Error: " + response.status + " " + response.statusText;
+            }
+        );
+
+
+    });
+
+    init();
+
+    ///////////////////////////
+
+
+    function init() {
+
+    }
+
+
+    function deleteBonsai() {
+
+        ngDialog.openConfirm({
+            template:
+            '<p>Are you sure you want to delete selected Bonsai?</p>' +
+            '<div>' +
+            '<button type="button" class="btn btn-default" ng-click="closeThisDialog(0)">No&nbsp;' +
+            '<button type="button" class="btn btn-primary pull-right" ng-click="confirm(1)">Yes' +
+            '</button></div>',
+            plain: true,
+            className: 'ngdialog-theme-default'
+        }).then(function (value) {
+            // perform delete operation
+
+            console.log("create", vm.bonsai);
+
+            Bonsai.delete(vm.bonsai).$promise.then(
+                function(data) {
+
+                    console.log("bonsai deleted", data);
+
+                    $state.go('app.list');
+                }
+            );
+
+        }, function (value) {
+            //Do something
+        });
+
+    }
+})
+
+.controller('ListCtrl', function($rootScope, $scope, $timeout, User, AuthService) {
 
     var vm = this;
 
     vm.bonsaiDetail = bonsaiDetail;
+
+    vm.doRefresh = function() {
+
+        console.log('Refreshing!');
+
+        User.bonsais({ id: 'me' })
+            .$promise.then(
+            function (response) {
+                vm.bonsais = response;
+
+                console.log("bonsais", vm.bonsais);
+
+                //Stop the ion-refresher from spinning
+                $scope.$broadcast('scroll.refreshComplete');
+
+            },
+            function (response) {
+                vm.message = "Error: " + response.status + " " + response.statusText;
+        });
+
+    };
 
     $rootScope.$on('login:Successful', function () {
         vm.loggedIn = AuthService.isAuthenticated();
@@ -290,18 +543,7 @@ angular.module('starter.controllers', [])
     function init() {
 
         vm.loggedIn = false;
-        vm.username = '';
 
-        if(AuthService.isAuthenticated()) {
-
-            vm.loggedIn = true;
-            vm.username = AuthService.getUsername();
-
-            console.log("currentUser", vm.username);
-
-
-
-        }
 
     }
 

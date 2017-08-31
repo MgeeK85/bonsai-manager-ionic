@@ -1,7 +1,6 @@
 angular.module('starter', [
     'ionic',
     'starter.controllers',
-    'starter.services',
     'ngDialog',
     'lbServices',
     'nvd3'
@@ -32,13 +31,14 @@ angular.module('starter', [
                   state: toState,
                   params: toParams
               };
-              $state.go('app');
+              $state.go('tabs.home');
           }
       });
 
       // Get data from localstorage after pagerefresh
       // and load user data into rootscope.
       if (LoopBackAuth.accessTokenId && !$rootScope.currentUser) {
+          console.log("page refresh");
           AuthService.refresh(LoopBackAuth.accessTokenId);
       }
 
@@ -84,6 +84,7 @@ angular.module('starter', [
   // Each tab has its own nav history stack:
   .state('tab.home', {
     url: '/home',
+      cache: false,
     views: {
       'tab-home': {
         templateUrl: 'templates/tab-home.html',
@@ -97,20 +98,31 @@ angular.module('starter', [
     views: {
       'tab-list': {
         templateUrl: 'templates/tab-list.html',
-        controller: 'ListCtrl'
+        controller: 'ListCtrl as list'
       }
     }
   })
 
+  .state('tab.detail', {
+    url: '/:id',
+    views:{
+        'tab-list':{
+            templateUrl: 'templates/bonsai-detail.html',
+            controller: 'BonsaiDetailCtrl as detail'
+        }
+    }
+  })
+
   .state('tab.newedit', {
-      url: '/newedit',
+      url: '/newedit/:id',
       views: {
           'tab-newedit': {
               templateUrl: 'templates/tab-newedit.html',
-              controller: 'NewEditCtrl'
+              controller: 'NewEditCtrl as newedit'
           }
       }
   })
+
 
   ;
 

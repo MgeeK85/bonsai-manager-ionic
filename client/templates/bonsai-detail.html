@@ -1,0 +1,38 @@
+<ion-view view-title="Detail">
+
+    <ion-content class="padding">
+
+        <div class="list list-inset">
+
+            <div class="item">
+                <strong>Name:</strong> <span>{{detail.bonsai.name}}</span>
+            </div>
+            <div class="item">
+                <strong>Species:</strong> <span>{{detail.bonsai.species}}</span>
+            </div>
+            <div class="item">
+                <strong>Style:</strong> <span>{{detail.bonsai.style}}</span>
+            </div>
+            <div class="item">
+                <strong>Age:</strong> <span>{{detail.bonsai.age}}</span>
+            </div>
+            <div class="item">
+                <strong>Height:</strong> <span>{{detail.bonsai.height}}</span>
+            </div>
+            <div class="item">
+                <strong>Diameter:</strong> <span>{{detail.bonsai.diameter}}</span>
+            </div>
+            <div class="item">
+                <strong>Pot:</strong> <span>{{detail.bonsai.pot}}</span>
+            </div>
+            <div class="item">
+                <strong>Note:</strong> <span>{{detail.bonsai.note}}</span>
+            </div>
+
+        </div>
+
+        <button class="button button-block button-balanced" ui-sref="tab.newedit({id: detail.bonsai.id})">Edit</button>
+        <button class="button button-block button-assertive" ng-click="detail.deleteBonsai()">Delete</button>
+
+    </ion-content>
+</ion-view>
